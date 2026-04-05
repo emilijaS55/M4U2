@@ -9,14 +9,13 @@ from logic import DatabaseManager, hide_img
 bot = TeleBot(API_TOKEN)
 db = DatabaseManager(DATABASE)
 
-# ================== КНОПКА ==================
+
 def gen_markup(prize_id):
     markup = InlineKeyboardMarkup()
     markup.add(InlineKeyboardButton("🎯 Получить!", callback_data=str(prize_id)))
     return markup
 
 
-# ================== CALLBACK ==================
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
     prize_id = call.data
@@ -29,7 +28,7 @@ def callback_query(call):
         if res:
             img = db.get_prize(prize_id)
 
-            # 💰 начисляем монеты
+           
             db.add_coins(user_id, 10)
 
             with open(f'img/{img}', 'rb') as photo:
@@ -44,7 +43,7 @@ def callback_query(call):
         bot.send_message(user_id, "😢 Ты не успел! Попробуй /retry")
 
 
-# ================== РАССЫЛКА ==================
+
 def send_message():
     prize = db.get_random_prize()
     if not prize:
@@ -73,7 +72,6 @@ def schedule_thread():
         time.sleep(1)
 
 
-# ================== СТАРТ ==================
 @bot.message_handler(commands=['start'])
 def start(message):
     user_id = message.chat.id
@@ -96,7 +94,6 @@ def start(message):
 """)
 
 
-# ================== МОНЕТЫ ==================
 @bot.message_handler(commands=['coins'])
 def coins(message):
     user_id = message.chat.id
@@ -105,7 +102,6 @@ def coins(message):
     bot.send_message(user_id, f"💰 У тебя {coins} монет")
 
 
-# ================== RETRY ==================
 @bot.message_handler(commands=['retry'])
 def retry(message):
     user_id = message.chat.id
@@ -129,7 +125,6 @@ def retry(message):
         bot.send_message(user_id, "❌ Недостаточно монет")
 
 
-# ================== РЕЙТИНГ ==================
 @bot.message_handler(commands=['rating'])
 def rating(message):
     res = db.get_rating()
@@ -141,7 +136,6 @@ def rating(message):
     bot.send_message(message.chat.id, text)
 
 
-# ================== АДМИН ==================
 @bot.message_handler(commands=['add'])
 def add_image(message):
     if message.chat.id not in ADMINS:
@@ -151,7 +145,6 @@ def add_image(message):
         bot.send_message(message.chat.id, "✅ Картинка добавлена (можно доработать сохранение)")
 
 
-# ================== ЗАПУСК ==================
 def polling():
     bot.polling(none_stop=True)
 
